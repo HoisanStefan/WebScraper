@@ -1,5 +1,9 @@
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
+const dictionaries = require("../data/dictionaries");
+
+const positiveWords = dictionaries.positiveWords;
+const negativeWords = dictionaries.negativeWords;
 
 const getHtml = async (url) => {
   const browser = await puppeteer.launch();
@@ -18,17 +22,10 @@ const getHtml = async (url) => {
   return html;
 };
 
-const scrapeURL = async (url) => {
-  const html = await getHtml(url);
-  const $ = cheerio.load(html);
+const extractTexts = ($) => {
+  texts = [];
 
-  const texts = [];
-  const anchors = [];
-  const scripts = [];
-  const images = [];
-
-  //   Texts
-  function extractText(element) {
+  const extractText = (element) => {
     const children = $(element).contents();
     children.each((index, child) => {
       if (child.type === "text" && $(child).text().trim() != "") {
@@ -37,9 +34,51 @@ const scrapeURL = async (url) => {
         extractText(child);
       }
     });
-  }
+  };
 
   extractText("body");
+
+  return texts;
+};
+
+const analyseText = (text) => {
+  const words = text.toLowerCase().split(" ");
+  let score = 0;
+  const positiveMatches = [];
+  const negativeMatches = [];
+
+  words.forEach((word) => {
+    if (positiveWords.includes(word)) {
+      score++;
+      positiveMatches.push(word);
+    } else if (negativeWords.includes(word)) {
+      score--;
+      negativeMatches.push(word);
+    }
+  });
+
+  const result = {
+    score,
+    comparative: score / words.length,
+    positiveMatches,
+    negativeMatches,
+    tokens: words,
+  };
+
+  return result;
+};
+
+const scrapeURL = async (url) => {
+  const html = await getHtml(url);
+  const $ = cheerio.load(html);
+
+  let texts = [];
+  const anchors = [];
+  const scripts = [];
+  const images = [];
+
+  //   Texts
+  texts = extractTexts($);
 
   //   Links
   $("a").each((index, element) => {
@@ -92,6 +131,28 @@ const scrapeURL = async (url) => {
   };
 };
 
+const analyseTexts = async (url) => {
+  const html = await getHtml(url);
+  const $ = cheerio.load(html);
+
+  let texts = [];
+
+  texts = extractTexts($);
+
+  texts = texts.map((text, index) => {
+    const result = analyseText(text);
+
+    return { text, sentimentResult: result };
+  });
+
+  return {
+    success: true,
+    texts,
+    numberOfTexts: texts.length,
+  };
+};
+
 module.exports = {
   scrapeURL,
+  analyseTexts,
 };

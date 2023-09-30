@@ -27,6 +27,14 @@ app.get("/scrapeTest", async (req, res) => {
   res.send(ans);
 });
 
+app.post("/analyseTexts", async (req, res) => {
+  const { url } = req.body;
+
+  let ans = await scrapeService.analyseTexts(url);
+
+  res.send(ans);
+});
+
 app.listen(PORT, () => {
   console.log("\x1b[32m%s\x1b[0m", "Server started on port:", PORT);
 });
