@@ -6,7 +6,7 @@ const positiveWords = dictionaries.positiveWords;
 const negativeWords = dictionaries.negativeWords;
 
 const getHtml = async (url) => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ headless: "new" });
 
   const page = await browser.newPage();
 

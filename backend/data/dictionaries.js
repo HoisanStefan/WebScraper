@@ -236,6 +236,7 @@ let positiveWords = [
   "Enhance",
   "Enlightened",
   "Enrich",
+  "Enriching",
   "Entertain",
   "Entertaining",
   "Enthusiast",
