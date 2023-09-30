@@ -12,7 +12,7 @@
 
 1. Install the npm dependencies by running the command `npm install` in both `backend` and `frontend` folders.
 
-2. After the dependencies has been installed, run the command `npm run start` in both of the folders from the first step.
+2. After the dependencies have been installed, run the command `npm run start` in both of the folders from the first step.
 
 3. The API will be running on port 8000 and the client on port 8080.
 
