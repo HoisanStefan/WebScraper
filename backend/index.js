@@ -13,16 +13,26 @@ app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-app.post("/scrapeUrl", async (req, res) => {
-  const { url } = req.body;
+const log = (ans) => {
+  const prettyJSON = JSON.stringify(ans, null, 2);
 
-  let ans = await scrapeService.scrapeURL(url);
+  console.log(prettyJSON);
+};
+
+app.post("/scrapeUrl", async (req, res) => {
+  const { url, texts, scripts, images, links } = req.body;
+
+  let ans = await scrapeService.scrapeURL(url, [texts, links, images, scripts]);
+
+  log(ans);
 
   res.send(ans);
 });
 
 app.get("/scrapeTest", async (req, res) => {
-  let ans = await scrapeService.scrapeURL(urlTest);
+  let ans = await scrapeService.scrapeURL(urlTest, [true, true, true, true]);
+
+  log(ans);
 
   res.send(ans);
 });

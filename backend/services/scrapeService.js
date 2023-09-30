@@ -68,7 +68,7 @@ const analyseText = (text) => {
   return result;
 };
 
-const scrapeURL = async (url) => {
+const scrapeURL = async (url, options) => {
   const html = await getHtml(url);
   const $ = cheerio.load(html);
 
@@ -77,46 +77,54 @@ const scrapeURL = async (url) => {
   const scripts = [];
   const images = [];
 
-  //   Texts
-  texts = extractTexts($);
+  if (options[0]) {
+    //   Texts
+    texts = extractTexts($);
+  }
 
-  //   Links
-  $("a").each((index, element) => {
-    const text = $(element).text();
-    let link = $(element).attr("href");
+  if (options[1]) {
+    //   Links
+    $("a").each((index, element) => {
+      const text = $(element).text();
+      let link = $(element).attr("href");
 
-    if (text && text != "" && link && link != "") {
-      if (!link.startsWith("http")) {
-        link = url + link;
+      if (text && text != "" && link && link != "") {
+        if (!link.startsWith("http")) {
+          link = url + link;
+        }
+
+        anchors.push({ text, link: link });
       }
+    });
+  }
 
-      anchors.push({ text, link: link });
-    }
-  });
+  if (options[2]) {
+    //   Images
+    $("img").each((index, element) => {
+      let src = $(element).attr("src");
 
-  //   Scripts
-  $("script").each((index, element) => {
-    let src = $(element).attr("src");
-
-    if (src) {
-      if (!src.startsWith("http")) {
-        src = url + src;
+      if (src) {
+        if (!src.startsWith("http")) {
+          src = url + src;
+        }
+        images.push(src);
       }
-      scripts.push(src);
-    }
-  });
+    });
+  }
 
-  //   Images
-  $("img").each((index, element) => {
-    let src = $(element).attr("src");
+  if (options[3]) {
+    //   Scripts
+    $("script").each((index, element) => {
+      let src = $(element).attr("src");
 
-    if (src) {
-      if (!src.startsWith("http")) {
-        src = url + src;
+      if (src) {
+        if (!src.startsWith("http")) {
+          src = url + src;
+        }
+        scripts.push(src);
       }
-      images.push(src);
-    }
-  });
+    });
+  }
 
   return {
     success: true,
