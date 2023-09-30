@@ -5,7 +5,7 @@ const scrapeService = require("./services/scrapeService");
 
 const app = express();
 
-const PORT = 8080;
+const PORT = 8000;
 
 const urlTest = "https://wsa-test.vercel.app/";
 
